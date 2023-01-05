@@ -123,13 +123,13 @@ static int mapdrv_open(struct inode *inoe, struct file *file)
 /* open handler for vm area */
 void map_vopen(struct vm_area_struct *vma)
 {
-    printk("MMAPTEST: mapping vma is opened..\n");
+    printk("MMAPTEST: mapping vma is opened\n");
 }
 
 /* close handler form vm area */
 void map_vclose(struct vm_area_struct *vma)
 {
-    printk("MMAPTEST: mapping vma is closed..\n");
+    printk("MMAPTEST: mapping vma is closed\n");
 }
 
 /* page fault handler */
