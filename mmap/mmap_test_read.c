@@ -4,6 +4,8 @@
 #include <sys/types.h>
 #include <fcntl.h>
 #include <stdlib.h>
+#include <errno.h>
+
 #define LEN (10 * 4096)
 
 int main(void)
@@ -11,8 +13,9 @@ int main(void)
     int fd, loop;
     char *vadr;
 
-    if ((fd = open("/dev/mapnopage", O_RDWR)) < 0)
+    if ((fd = open("/dev/mmaptest", O_RDWR)) < 0)
     {
+        printf("open device /dev/mmaptest failed, errno is %d\n", errno);
         return 0;
     }
     vadr = mmap(0, LEN, PROT_READ, MAP_PRIVATE | MAP_LOCKED, fd, 0);
