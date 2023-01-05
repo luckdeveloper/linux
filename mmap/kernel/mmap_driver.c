@@ -23,8 +23,10 @@ void map_vclose(struct vm_area_struct *vma);
 static int mapdrv_mmap(struct file *file, struct vm_area_struct *vma);
 static int mapdrv_open(struct inode *inode, struct file *file);
 
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,11,0))   
 /* vm area nopage */
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,1,0))  
+unsigned int map_fault(struct vm_fault *vmf);
+#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(4,11,0))  
 int map_fault(struct vm_fault *vmf);
 #else
 int map_fault(struct vm_area_struct *vma, struct vm_fault *vmf);
@@ -134,8 +136,12 @@ void map_vclose(struct vm_area_struct *vma)
 
 /* page fault handler */
 
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,11,0))   
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,11,0))
+    #if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,1,0))
+unsigned int map_fault(struct vm_fault *vmf)
+    #else
 int map_fault(struct vm_fault *vmf)
+    #endif
 {
     struct page *page;
     void *page_ptr;
