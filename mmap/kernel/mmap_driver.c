@@ -135,7 +135,6 @@ void map_vclose(struct vm_area_struct *vma)
 }
 
 /* page fault handler */
-
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,11,0))
     #if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,1,0))
 unsigned int map_fault(struct vm_fault *vmf)
@@ -172,6 +171,10 @@ int map_fault(struct vm_fault *vmf)
    return 0;
 }
 #else
+/**
+ * After fault() has done its work, it should store a pointer to the page 
+ * structure for the faulted-in page in the page field 
+*/
 int map_fault(struct vm_area_struct *vma, struct vm_fault *vmf)
 {
 
@@ -185,6 +188,11 @@ int map_fault(struct vm_area_struct *vma, struct vm_fault *vmf)
         return VM_FAULT_SIGBUS;
     }
 
+    /* 
+    * vm_fault::virtual_address: faulting virtual address
+    * vm_area_struct::vm_start: start address within vm_mm
+    */
+    
     offset = (unsigned long)(vmf->virtual_address - vma->vm_start);
     if (offset >= MAPLEN)
     {
@@ -192,16 +200,22 @@ int map_fault(struct vm_area_struct *vma, struct vm_fault *vmf)
         return VM_FAULT_SIGBUS;
     }
 
+    /*
+    * we assigned allocated memory to fault page 
+    */
     page_ptr = vmalloc_area + offset;
     page = vmalloc_to_page(page_ptr);
     get_page(page);
     vmf->page = page;
 
+    /* *******DEBUG OUTPUT ********* */
     virt_start = (unsigned long)vmalloc_area + (unsigned long)(vmf->pgoff << PAGE_SHIFT);
     pfn_start = (unsigned long)vmalloc_to_pfn((void *)virt_start);
+    printk("MMAPTEST: %s: map VMALLOC：0x%lx (PFN: 0x%016lx) to vm faulting address: 0x%lx , size: 0x%lx, page:%ld \n",   
+            __func__, virt_start, pfn_start << PAGE_SHIFT, (unsigned long)vmf->virtual_address, PAGE_SIZE, vmf->pgoff);
+    
 
-    printk("MMAPTEST: %s: map 0x%lx (0x%016lx) to 0x%lx , size: 0x%lx, page:%ld \n", __func__, virt_start, pfn_start << PAGE_SHIFT, vmf->virtual_address, PAGE_SIZE, vmf->pgoff);
-    return 0;
+    return VM_FAULT_MAJOR;
 }
 #endif
 
