@@ -6,7 +6,10 @@
 #include <stdlib.h>  
 #include <errno.h>
 
-#define LEN (10*4096)
+#define PAGE_SIZE (4096)
+#define LEN (10*PAGE_SIZE)
+
+
 int main(void)
 {
     int fd;

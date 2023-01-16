@@ -6,7 +6,8 @@
 #include <stdlib.h>
 #include <errno.h>
 
-#define LEN (10 * 4096)
+#define PAGE_SIZE (4096)
+#define LEN (10*PAGE_SIZE)
 
 int main(void)
 {
@@ -21,7 +22,9 @@ int main(void)
     vadr = mmap(0, LEN, PROT_READ, MAP_PRIVATE | MAP_LOCKED, fd, 0);
     for (loop = 0; loop < 10; loop++)
     {
-        printf("[%-10s----%lx]\n", vadr + 4096 * loop, vadr + 4096 * loop);
+        printf("[%-10s---- access address: %lx]\n", 
+            vadr + PAGE_SIZE * loop, 
+            vadr + PAGE_SIZE * loop);
     }
     while (1)
     {
