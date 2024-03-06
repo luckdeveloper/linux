@@ -102,8 +102,14 @@ static int mapdrv_mmap(struct file *file, struct vm_area_struct *vma)
         printk("MMAPTEST: writeable mappings must be shared, rejecting\n");
         return -EINVAL;
     }
+    
     /* do not want to have this area swapped out, lock it */
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6,3,0)) 
+    vm_flags_set(vma, VM_LOCKONFAULT);
+#else 
     vma->vm_flags |= VM_LOCKONFAULT;
+#endif
+
     if (offset == 0)
     {
         vma->vm_ops = &map_vm_ops;
